@@ -46,44 +46,31 @@ const pintarTableroBocaAbajo = (): void => {
 };
 
 const alPincharCarta = (indice: number): void => {
-  const carta = tablero.cartas[indice];
-  if (carta.estaVuelta || carta.encontrada) {
-    mostrarMensaje("Esa carta ya está volteada");
-    return;
-  }
-
   if (!sePuedeVoltearLaCarta(tablero, indice)) {
-    return;
+    mostrarMensaje("Esa carta ya está volteada.");
+  } else {
+    mostrarMensaje("");
+    voltearLaCarta(tablero, indice);
+    pintarCarta(indice);
+
+    const indiceA = tablero.indiceCartaVolteadaA;
+    const indiceB = tablero.indiceCartaVolteadaB;
+    
+    if (tablero.estadoPartida === "DosCartasLevantadas" && indiceA !== undefined && indiceB !== undefined) {
+      intentos = intentos + 1;
+      pintarIntentos();
+
+      if (sonPareja(indiceA, indiceB, tablero)) {
+        parejaEncontrada(tablero, indiceA, indiceB);
+      } else {
+        setTimeout(() => {
+          parejaNoEncontrada(tablero, indiceA, indiceB);
+          pintarCarta(indiceA);
+          pintarCarta(indiceB);
+        }, 1000);
+      }
+    }
   }
-
-  mostrarMensaje("");
-  voltearLaCarta(tablero, indice);
-  pintarCarta(indice);
-
-  // Si todavía no hay dos cartas levantadas, no hay nada más que hacer
-  if (tablero.estadoPartida !== "DosCartasLevantadas") {
-    return;
-  }
-
-  const indiceA = tablero.indiceCartaVolteadaA;
-  const indiceB = tablero.indiceCartaVolteadaB;
-  if (indiceA === undefined || indiceB === undefined) {
-    return;
-  }
-
-  intentos = intentos + 1;
-  pintarIntentos();
-
-  if (sonPareja(indiceA, indiceB, tablero)) {
-    parejaEncontrada(tablero, indiceA, indiceB);
-    return;
-  }
-
-  setTimeout(() => {
-    parejaNoEncontrada(tablero, indiceA, indiceB);
-    pintarCarta(indiceA);
-    pintarCarta(indiceB);
-  }, 1000);
 };
 
 export const prepararUI = (): void => {
